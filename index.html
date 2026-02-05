@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Class 10 Percentage Calculator</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Patrick Hand', cursive;
+      background: linear-gradient(135deg, #8360c3, #2ebf91);
+      transition: 0.3s;
+    }
+
+    body.dark {
+      background: linear-gradient(135deg, #141e30, #243b55);
+      color: white;
+    }
+
+    .container {
+      width: 460px;
+      background: white;
+      padding: 28px;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.3);
+      position: relative;
+      transition: 0.3s;
+    }
+
+    body.dark .container {
+      background: #1f2933;
+      color: white;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 26px;
+    }
+
+    .tools {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+    }
+
+    .tools button {
+      margin-left: 6px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: 'Patrick Hand', cursive;
+    }
+
+    .dark-btn { background: #333; color: white; }
+    .guide-btn { background: #2ebf91; color: white; }
+
+    .subject {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+      font-size: 18px;
+    }
+
+    .subject label { width: 55%; }
+
+    .subject input {
+      width: 35%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1.5px solid #999;
+      font-size: 16px;
+      text-align: center;
+      font-family: 'Patrick Hand', cursive;
+    }
+
+    body.dark input {
+      background: #374151;
+      color: white;
+      border-color: #777;
+    }
+
+    button.calculate {
+      width: 100%;
+      margin-top: 18px;
+      padding: 12px;
+      background: #2ebf91;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      font-family: 'Patrick Hand', cursive;
+    }
+
+    #output {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 19px;
+      line-height: 1.6;
+    }
+
+    .guide {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      width: 320px;
+      border-radius: 14px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      z-index: 10;
+    }
+
+    body.dark .guide {
+      background: #1f2933;
+      color: white;
+    }
+
+    .guide button {
+      margin-top: 12px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #2ebf91;
+      color: white;
+      cursor: pointer;
+      font-family: 'Patrick Hand', cursive;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="tools">
+    <button class="guide-btn" onclick="toggleGuide()">📘 Guide</button>
+    <button class="dark-btn" onclick="toggleDark()">🌙</button>
+  </div>
+
+  <h2>📘 Class 10 Percentage Calculator</h2>
+
+  <div class="subject"><label>English (Compulsory)</label><input type="number" class="mark"></div>
+  <div class="subject"><label>Mathematics</label><input type="number" class="mark"></div>
+  <div class="subject"><label>Science</label><input type="number" class="mark"></div>
+  <div class="subject"><label>Social Science</label><input type="number" class="mark"></div>
+  <div class="subject"><label>Hindi</label><input type="number" class="mark"></div>
+  <div class="subject"><label>Optional / Skill Subject</label><input type="number" class="mark"></div>
+
+  <button class="calculate" onclick="calculate()">Calculate Best of 5</button>
+
+  <div id="output"></div>
+</div>
+
+<div class="guide" id="guideBox">
+  <strong>📘 CBSE Best of 5 Rules</strong><br><br>
+  • English is compulsory<br>
+  • English is never replaced<br>
+  • Lowest non-English subject is replaced<br>
+  • Percentage = (Best 5 / 500) × 100
+  <br>
+  <button onclick="toggleGuide()">Close</button>
+</div>
+
+<script>
+function calculate() {
+  const inputs = document.querySelectorAll(".mark");
+  const subjects = [
+    "English", "Mathematics", "Science",
+    "Social Science", "Hindi", "Optional / Skill"
+  ];
+
+  let data = [];
+
+  for (let i = 0; i < inputs.length; i++) {
+    let v = Number(inputs[i].value);
+    if (isNaN(v) || v < 0 || v > 100) {
+      document.getElementById("output").innerHTML =
+        "❌ Enter valid marks (0–100)";
+      return;
+    }
+    data.push({ subject: subjects[i], marks: v });
+  }
+
+  const english = data[0];              // compulsory
+  const others = data.slice(1);         // remaining subjects
+
+  others.sort((a, b) => b.marks - a.marks);
+
+  const bestFour = others.slice(0, 4);
+  const excluded = others[others.length - 1];
+
+  const total =
+    english.marks +
+    bestFour.reduce((s, x) => s + x.marks, 0);
+
+  const percentage = (total / 500) * 100;
+
+  document.getElementById("output").innerHTML = `
+    ✅ Percentage (Best of 5): <strong>${percentage.toFixed(2)}%</strong><br>
+    🔁 Replaced Subject: <strong>${excluded.subject} (${excluded.marks})</strong>
+  `;
+}
+
+function toggleDark() {
+  document.body.classList.toggle("dark");
+}
+
+function toggleGuide() {
+  const g = document.getElementById("guideBox");
+  g.style.display = g.style.display === "block" ? "none" : "block";
+}
+</script>
+
+</body>
+</html>
